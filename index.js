@@ -23,37 +23,31 @@ app.use(function (req, res, next) {
 const port = 5000;
 app.use(express.json());
 app.get('/',(req,res)=>{
-    res.send("Hello Rent House")
+    res.send("Hello Airbnb Rent House")
 })
-var uri = "mongodb://Rent:i3vPcWslrQgSce6G@cluster0-shard-00-00.7auxx.mongodb.net:27017,cluster0-shard-00-01.7auxx.mongodb.net:27017,cluster0-shard-00-02.7auxx.mongodb.net:27017/?ssl=true&replicaSet=atlas-quc4tl-shard-0&authSource=admin&retryWrites=true&w=majority";
+var uri = `mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0-shard-00-00.7auxx.mongodb.net:27017,cluster0-shard-00-01.7auxx.mongodb.net:27017,cluster0-shard-00-02.7auxx.mongodb.net:27017/?ssl=true&replicaSet=atlas-quc4tl-shard-0&authSource=admin&retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 async function run() {
   try {
     await client.connect();
         
-    const rents=client.db("Rent").collection("house")
+    const rents=client.db("Airbnb").collection("products")
     
-    app.post("/house", async (req, res) => {
+    app.post("/product", async (req, res) => {
       const doc=req.body
        const result =await rents.insertOne(doc);
       
        res.send(result);
      });
     
-     app.get("/house",async(req,res)=>{
+     app.get("/product",async(req,res)=>{
       const query={}
         const result=rents.find(query)
         const post=await result.toArray()
         res.send(post)
         
      })
-     app.get('/house/:id',async(req,res)=>{
-        const id=(req.params.id);
-        const query={_id:new ObjectId(id)}
-        const result=await rents.findOne(query)
-        res.send(result)
-    })
-  
+     
      
   } 
   finally {
